@@ -34,7 +34,7 @@ for path in modePathList:
     imgModeList.append(cv2.imread(os.path.join(folderModePath, path)))
 # print(len(imgModeList))
 
-# Load the encoding file
+# Loading the encoding file
 print("Loading Encode File ...")
 file = open('EncodeFile.p', 'rb')
 encodeListKnownWithIds = pickle.load(file)
@@ -51,15 +51,17 @@ imgStudent = []
 while True:
     success, img = cap.read()
 
-    imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
+    imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25) #making image size small
     imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
 
-    faceCurFrame = face_recognition.face_locations(imgS)
-    encodeCurFrame = face_recognition.face_encodings(imgS, faceCurFrame)
+    #feeding values in frs
+    faceCurFrame = face_recognition.face_locations(imgS)  #face in current frame (old)
+    encodeCurFrame = face_recognition.face_encodings(imgS, faceCurFrame) #encoding in current frame (new)
 
     imgBackground[162:162 + 480, 55:55 + 640] = img  #overlaying image into graphics
     imgBackground[44:44 + 633, 808:808 + 414] = imgModeList[modeType] #overlaying modes
 
+    #comparing encodings
     if faceCurFrame:
         for encodeFace, faceLoc in zip(encodeCurFrame, faceCurFrame):
             matches = face_recognition.compare_faces(encodeListKnown, encodeFace)
@@ -73,6 +75,8 @@ while True:
             if matches[matchIndex]:
                 # print("Known Face Detected")
                 # print(studentIds[matchIndex])
+
+                #drawing box around face
                 y1, x2, y2, x1 = faceLoc
                 y1, x2, y2, x1 = y1 * 4, x2 * 4, y2 * 4, x1 * 4
                 bbox = 55 + x1, 162 + y1, x2 - x1, y2 - y1
